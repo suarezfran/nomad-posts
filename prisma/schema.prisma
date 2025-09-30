@@ -17,6 +17,8 @@ model User {
   address  Address?
   company  Company?
   posts    Post[]
+
+  @@index([id])
 }
 
 model Address {
