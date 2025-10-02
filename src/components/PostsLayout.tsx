@@ -37,6 +37,10 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
       setLoading(false);
     }
   };
+
+  const handleDeletePost = (postId: number) => {
+    setPosts(prev => prev.filter(post => post.id !== postId));
+  };
   return (
     <main className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto py-8 px-4">
@@ -51,7 +55,7 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
 
         <section className="space-y-6" aria-label="Posts list">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} onDelete={handleDeletePost} />
           ))}
         </section>
 
