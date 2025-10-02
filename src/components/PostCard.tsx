@@ -1,12 +1,7 @@
+import { Post } from '@/types';
+
 interface PostCardProps {
-  post: {
-    id: number;
-    title: string;
-    body: string;
-    user: {
-      name: string;
-    };
-  };
+  post: Post;
 }
 
 export default function PostCard({ post }: PostCardProps) {

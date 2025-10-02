@@ -1,14 +1,6 @@
 import PostsLayout from '@/components/PostsLayout';
 import prisma from '@/lib/prisma';
-
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-  user: {
-    name: string;
-  };
-}
+import { Post } from '@/types';
 
 const POSTS_PER_PAGE = 10;
 
