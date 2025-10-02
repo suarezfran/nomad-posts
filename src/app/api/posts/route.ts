@@ -7,10 +7,18 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const cursor = searchParams.get('cursor');
+    const userId = searchParams.get('userId');
+
+    // Build the where clause
+    const whereClause: any = {};
+    if (userId) {
+      whereClause.userId = parseInt(userId);
+    }
 
     // Fetch one extra post to determine if there are more
     const posts = await prisma.post.findMany({
       take: POSTS_PER_PAGE + 1,
+      where: whereClause,
       ...(cursor && {
         cursor: {
           id: parseInt(cursor)
@@ -71,7 +79,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting post:', error);
-    console.error('Error details:', JSON.stringify(error, null, 2));
     return NextResponse.json(
       { error: 'Failed to delete post' },
       { status: 500 }

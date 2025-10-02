@@ -2,12 +2,18 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import PostCard from './PostCard';
 import NoPostsFound from './NoPostsFound';
 import EndOfPosts from './EndOfPosts';
 import LoadingButton from './LoadingButton';
+import FilteringLoader from './FilteringLoader';
 import toast from 'react-hot-toast';
 import { Post } from '@/types';
+
+const UserFilter = dynamic(() => import('./UserFilter'), {
+  ssr: false
+});
 
 interface PostsLayoutProps {
   initialPosts: Post[];
@@ -20,13 +26,19 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [cursor, setCursor] = useState<number | null>(initialCursor);
   const [loading, setLoading] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const loadMore = async () => {
     if (loading || !cursor) return;
     
     setLoading(true);
     try {
-      const response = await fetch(`/api/posts?cursor=${cursor}`);
+      const url = currentUserId 
+        ? `/api/posts?cursor=${cursor}&userId=${currentUserId}`
+        : `/api/posts?cursor=${cursor}`;
+      
+      const response = await fetch(url);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -42,6 +54,39 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
       toast.error(error instanceof Error ? error.message : 'Failed to load posts');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFilter = async (userId: number | null) => {
+    if (filterLoading) return;
+    
+    setFilterLoading(true);
+    setCurrentUserId(userId);
+    
+    try {
+      const url = userId ? `/api/posts?userId=${userId}` : '/api/posts';
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to load posts');
+      }
+      
+      const data = await response.json();
+      
+      // Check if no posts found for the user
+      if (userId && data.posts.length === 0) {
+        toast.error(`No posts found for user ID ${userId}. User may not exist or has no posts.`);
+      }
+      
+      setPosts(data.posts);
+      setHasMore(data.hasMore);
+      setCursor(data.nextCursor);
+    } catch (error) {
+      console.error('Error filtering posts:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to filter posts');
+    } finally {
+      setFilterLoading(false);
     }
   };
 
@@ -77,18 +122,23 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
           </nav>
         </header>
 
+        <UserFilter onFilter={handleFilter} disabled={filterLoading} />
+
         <section className="space-y-6" aria-label="Posts list">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} onDelete={handleDeletePost} />
-          ))}
+          {filterLoading ? (
+            <FilteringLoader />
+          ) : (
+            posts.map((post) => (
+              <PostCard key={post.id} post={post} onDelete={handleDeletePost} />
+            ))
+          )}
         </section>
 
-        {posts.length === 0 && <NoPostsFound />}
+        {posts.length === 0 && !filterLoading && <NoPostsFound />}
 
+        {hasMore && !filterLoading && <LoadingButton onClick={loadMore} loading={loading} />}
 
-        {hasMore && <LoadingButton onClick={loadMore} loading={loading} />}
-
-        {!hasMore && posts.length > 0 && <EndOfPosts />}
+        {!hasMore && posts.length > 0 && !filterLoading && <EndOfPosts />}
       </div>
     </main>
   );
