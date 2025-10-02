@@ -6,6 +6,7 @@ import PostCard from './PostCard';
 import NoPostsFound from './NoPostsFound';
 import EndOfPosts from './EndOfPosts';
 import LoadingButton from './LoadingButton';
+import toast from 'react-hot-toast';
 import { Post } from '@/types';
 
 interface PostsLayoutProps {
@@ -26,13 +27,19 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
     setLoading(true);
     try {
       const response = await fetch(`/api/posts?cursor=${cursor}`);
-      const data = await response.json();
       
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to load posts');
+      }
+      
+      const data = await response.json();
       setPosts(prev => [...prev, ...data.posts]);
       setHasMore(data.hasMore);
       setCursor(data.nextCursor);
     } catch (error) {
       console.error('Error loading more posts:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to load posts');
     } finally {
       setLoading(false);
     }
@@ -40,25 +47,22 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
 
   const handleDeletePost = async (postId: number) => {
     try {
-      console.log('Attempting to delete post with ID:', postId);
       const response = await fetch(`/api/posts?id=${postId}`, {
         method: 'DELETE',
       });
 
-      console.log('Delete response status:', response.status);
-      
       if (response.ok) {
-        console.log('Post deleted successfully');
         // Remove the post from the local state
         setPosts(prev => prev.filter(post => post.id !== postId));
+        toast.success('Post deleted successfully');
       } else {
         const errorData = await response.json();
         console.error('Failed to delete post:', response.status, errorData);
-        // You could add a toast notification here
+        toast.error(errorData.error || 'Failed to delete post');
       }
     } catch (error) {
       console.error('Error deleting post:', error);
-      // You could add a toast notification here
+      toast.error(error instanceof Error ? error.message : 'Failed to delete post');
     }
   };
   return (
@@ -80,6 +84,7 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
         </section>
 
         {posts.length === 0 && <NoPostsFound />}
+
 
         {hasMore && <LoadingButton onClick={loadMore} loading={loading} />}
 

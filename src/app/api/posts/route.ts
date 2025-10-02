@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
       nextCursor
     });
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error('Error loading posts:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch posts' },
+      { error: 'Failed loading posts' },
       { status: 500 }
     );
   }
@@ -64,7 +64,7 @@ export async function DELETE(request: NextRequest) {
 
     await prisma.post.delete({
       where: {
-        id: parseInt(postId)
+        id: parseInt(postId!)
       }
     });
 
