@@ -38,8 +38,28 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
     }
   };
 
-  const handleDeletePost = (postId: number) => {
-    setPosts(prev => prev.filter(post => post.id !== postId));
+  const handleDeletePost = async (postId: number) => {
+    try {
+      console.log('Attempting to delete post with ID:', postId);
+      const response = await fetch(`/api/posts?id=${postId}`, {
+        method: 'DELETE',
+      });
+
+      console.log('Delete response status:', response.status);
+      
+      if (response.ok) {
+        console.log('Post deleted successfully');
+        // Remove the post from the local state
+        setPosts(prev => prev.filter(post => post.id !== postId));
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to delete post:', response.status, errorData);
+        // You could add a toast notification here
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      // You could add a toast notification here
+    }
   };
   return (
     <main className="min-h-screen bg-white">

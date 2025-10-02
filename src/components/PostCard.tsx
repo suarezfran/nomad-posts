@@ -2,6 +2,7 @@ import { Post } from '@/types';
 import { useState } from 'react';
 import ThreeDotsButton from './ThreeDotsButton';
 import DropdownMenu from './DropdownMenu';
+import ConfirmationModal from './ConfirmationModal';
 
 interface PostCardProps {
   post: Post;
@@ -10,6 +11,21 @@ interface PostCardProps {
 
 export default function PostCard({ post, onDelete }: PostCardProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowMenu(false);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(post.id);
+    setShowConfirmModal(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmModal(false);
+  };
 
   return (
     <article className="border border-gray-200 rounded-lg p-6">
@@ -29,7 +45,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
           />
           <DropdownMenu 
             isOpen={showMenu} 
-            onDelete={() => onDelete(post.id)} 
+            onDelete={handleDeleteClick} 
           />
         </div>
       </header>
@@ -37,6 +53,16 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
       <h2 className="text-lg font-semibold mb-3 text-black">{post.title}</h2>
       
       <p className="text-gray-700 leading-relaxed text-black">{post.body}</p>
+      
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </article>
   );
 }
