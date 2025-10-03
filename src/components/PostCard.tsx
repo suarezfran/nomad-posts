@@ -67,7 +67,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
     <article className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-200 hover:border-gray-200">
       <header className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <div className={`w-12 h-12 bg-gradient-to-r ${avatarColor} rounded-2xl flex items-center justify-center text-white font-semibold text-lg shadow-sm`} role="img" aria-label={`Avatar for ${post.user.name}`}>
+          <div className={`w-12 h-12 bg-gradient-to-r ${avatarColor} rounded-xl flex items-center justify-center text-white font-semibold text-lg shadow-sm`} role="img" aria-label={`Avatar for ${post.user.name}`}>
             {post.user.name.charAt(0).toUpperCase()}
           </div>
           <div className="ml-4">

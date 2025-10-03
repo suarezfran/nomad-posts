@@ -106,7 +106,7 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
   };
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="max-w-3xl mx-auto py-12 px-6">
+      <div className="mx-48 py-12">
         <header className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
