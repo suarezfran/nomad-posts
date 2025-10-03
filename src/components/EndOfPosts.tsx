@@ -7,7 +7,7 @@ export default function EndOfPosts() {
         </svg>
       </div>
       <h3 className="text-lg font-semibold text-gray-700 mb-2">All caught up!</h3>
-      <p className="text-gray-500">You've reached the end of the posts</p>
+      <p className="text-gray-500">You&aposve reached the end of the posts</p>
     </div>
   );
 }

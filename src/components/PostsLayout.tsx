@@ -1,57 +1,68 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import PostCard from './PostCard';
-import NoPostsFound from './NoPostsFound';
-import EndOfPosts from './EndOfPosts';
-import LoadingButton from './LoadingButton';
-import FilteringLoader from './FilteringLoader';
-import toast from 'react-hot-toast';
-import { Post } from '@/types';
+import Link from "next/link";
+import { useState } from "react";
+import PostCard from "./PostCard";
+import NoPostsFound from "./NoPostsFound";
+import EndOfPosts from "./EndOfPosts";
+import LoadingButton from "./LoadingButton";
+import FilteringLoader from "./FilteringLoader";
+import UserFilter from "./UserFilter";
+import toast from "react-hot-toast";
+import { Post } from "@/types";
 
-const UserFilter = dynamic(() => import('./UserFilter'), {
-  ssr: false
-});
+interface UserOption {
+  value: number;
+  label: string;
+}
 
 interface PostsLayoutProps {
   initialPosts: Post[];
   hasMore: boolean;
   initialCursor: number | null;
+  initialUser: UserOption | null;
 }
 
-export default function PostsLayout({ initialPosts, hasMore: initialHasMore, initialCursor }: PostsLayoutProps) {
+export default function PostsLayout({
+  initialPosts,
+  hasMore: initialHasMore,
+  initialCursor,
+  initialUser,
+}: PostsLayoutProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [cursor, setCursor] = useState<number | null>(initialCursor);
   const [loading, setLoading] = useState(false);
   const [filterLoading, setFilterLoading] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(
+    initialUser?.value || null,
+  );
 
   const loadMore = async () => {
     if (loading || !cursor) return;
-    
+
     setLoading(true);
     try {
-      const url = currentUserId 
+      const url = currentUserId
         ? `/api/posts?cursor=${cursor}&userId=${currentUserId}`
         : `/api/posts?cursor=${cursor}`;
-      
+
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to load posts');
+        throw new Error(errorData.error || "Failed to load posts");
       }
-      
+
       const data = await response.json();
-      setPosts(prev => [...prev, ...data.posts]);
+      setPosts((prev) => [...prev, ...data.posts]);
       setHasMore(data.hasMore);
       setCursor(data.nextCursor);
     } catch (error) {
-      console.error('Error loading more posts:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to load posts');
+      console.error("Error loading more posts:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to load posts",
+      );
     } finally {
       setLoading(false);
     }
@@ -59,26 +70,28 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
 
   const handleFilter = async (userId: number | null) => {
     if (filterLoading) return;
-    
+
     setFilterLoading(true);
     setCurrentUserId(userId);
-    
+
     try {
-      const url = userId ? `/api/posts?userId=${userId}` : '/api/posts';
+      const url = userId ? `/api/posts?userId=${userId}` : "/api/posts";
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to load posts');
+        throw new Error(errorData.error || "Failed to load posts");
       }
-      
+
       const data = await response.json();
       setPosts(data.posts);
       setHasMore(data.hasMore);
       setCursor(data.nextCursor);
     } catch (error) {
-      console.error('Error filtering posts:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to filter posts');
+      console.error("Error filtering posts:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to filter posts",
+      );
     } finally {
       setFilterLoading(false);
     }
@@ -87,21 +100,23 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
   const handleDeletePost = async (postId: number) => {
     try {
       const response = await fetch(`/api/posts?id=${postId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
         // Remove the post from the local state
-        setPosts(prev => prev.filter(post => post.id !== postId));
-        toast.success('Post deleted successfully');
+        setPosts((prev) => prev.filter((post) => post.id !== postId));
+        toast.success("Post deleted successfully");
       } else {
         const errorData = await response.json();
-        console.error('Failed to delete post:', response.status, errorData);
-        toast.error(errorData.error || 'Failed to delete post');
+        console.error("Failed to delete post:", response.status, errorData);
+        toast.error(errorData.error || "Failed to delete post");
       }
     } catch (error) {
-      console.error('Error deleting post:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to delete post');
+      console.error("Error deleting post:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete post",
+      );
     }
   };
   return (
@@ -111,29 +126,58 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl mr-4 shadow-md">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                  />
                 </svg>
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                   Posts
                 </h1>
-                <p className="text-sm text-gray-600">Discover stories and experiences from our community</p>
+                <p className="text-sm text-gray-600">
+                  Discover stories and experiences from our community
+                </p>
               </div>
             </div>
             <nav>
-              <Link href="/" className="bg-slate-100 px-3 py-2 hover:bg-slate-200 rounded-md inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors text-sm">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <Link
+                href="/"
+                className="bg-slate-100 px-3 py-2 hover:bg-slate-200 rounded-md inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors text-sm"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
                 </svg>
                 Back to Home
               </Link>
             </nav>
           </div>
-          
+
           <div className="border-t border-gray-100 pt-4">
-            <UserFilter onFilter={handleFilter} disabled={filterLoading} />
+            <UserFilter
+              onFilter={handleFilter}
+              disabled={filterLoading}
+              initialUser={initialUser}
+            />
           </div>
         </header>
 
@@ -149,7 +193,9 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
 
         {posts.length === 0 && !filterLoading && <NoPostsFound />}
 
-        {hasMore && !filterLoading && <LoadingButton onClick={loadMore} loading={loading} />}
+        {hasMore && !filterLoading && (
+          <LoadingButton onClick={loadMore} loading={loading} />
+        )}
 
         {!hasMore && posts.length > 0 && !filterLoading && <EndOfPosts />}
       </div>
