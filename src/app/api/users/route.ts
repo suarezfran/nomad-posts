@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,13 +8,13 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     // Build the where clause for user search
-    const whereClause = search 
+    const whereClause: Prisma.UserWhereInput = search
       ? {
-          OR: [
-            { name: { contains: search } },
-            { username: { contains: search } }
-          ]
-        }
+        OR: [
+          { name: { contains: search } },
+          { username: { contains: search } }
+        ]
+      }
       : {};
 
     // Fetch users with search functionality
