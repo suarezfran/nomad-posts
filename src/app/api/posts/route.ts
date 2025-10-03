@@ -10,10 +10,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
 
     // Build the where clause
-    const whereClause: any = {};
-    if (userId) {
-      whereClause.userId = parseInt(userId);
-    }
+    const whereClause = userId ? { userId: parseInt(userId) } : {};
 
     // Fetch one extra post to determine if there are more
     const posts = await prisma.post.findMany({
@@ -72,7 +69,7 @@ export async function DELETE(request: NextRequest) {
 
     await prisma.post.delete({
       where: {
-        id: parseInt(postId!)
+        id: parseInt(postId)
       }
     });
 

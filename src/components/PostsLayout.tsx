@@ -73,12 +73,6 @@ export default function PostsLayout({ initialPosts, hasMore: initialHasMore, ini
       }
       
       const data = await response.json();
-      
-      // Check if no posts found for the user
-      if (userId && data.posts.length === 0) {
-        toast.error(`No posts found for user ID ${userId}. User may not exist or has no posts.`);
-      }
-      
       setPosts(data.posts);
       setHasMore(data.hasMore);
       setCursor(data.nextCursor);

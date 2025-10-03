@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import Select, { SingleValue } from 'react-select';
+import toast from 'react-hot-toast';
 import { User } from '@/types';
 
 interface UserOption {
   value: number;
   label: string;
-  user: User;
 }
 
 interface UserFilterProps {
@@ -35,13 +35,13 @@ export default function UserFilter({ onFilter, disabled }: UserFilterProps) {
       .then(data => {
         const userOptions = data.users.map((user: User) => ({
           value: user.id,
-          label: `${user.name}${user.username ? ` (@${user.username})` : ''}`,
-          user
+          label: `${user.name}${user.username ? ` (@${user.username})` : ''}`
         }));
         setOptions(userOptions);
       })
       .catch(error => {
         console.error('Error loading users:', error);
+        toast.error('Failed to search users. Please try again.');
         setOptions([]);
       })
       .finally(() => {
@@ -50,11 +50,7 @@ export default function UserFilter({ onFilter, disabled }: UserFilterProps) {
   };
 
   const handleChange = (selectedOption: SingleValue<UserOption>) => {
-    if (selectedOption) {
-      onFilter(selectedOption.value);
-    } else {
-      onFilter(null);
-    }
+    onFilter(selectedOption ? selectedOption.value : null);
   };
 
   return (
@@ -62,28 +58,24 @@ export default function UserFilter({ onFilter, disabled }: UserFilterProps) {
       <label className="block text-sm font-medium text-gray-700 mb-2">
         Filter by User
       </label>
-      <div className="flex gap-2">
-        <div className="flex-1">
-          <Select
-            isClearable
-            isSearchable
-            isLoading={isLoading}
-            isDisabled={disabled}
-            options={options}
-            onInputChange={loadUsers}
-            onChange={handleChange}
-            placeholder="Search for a user..."
-            noOptionsMessage={() => "Type at least 2 characters to search..."}
-            loadingMessage={() => "Searching users..."}
-            styles={{
-              option: (base) => ({
-                ...base,
-                color: 'black'
-              })
-            }}
-          />
-        </div>
-      </div>
+      <Select
+        isClearable
+        isSearchable
+        isLoading={isLoading}
+        isDisabled={disabled}
+        options={options}
+        onInputChange={loadUsers}
+        onChange={handleChange}
+        placeholder="Search for a user..."
+        noOptionsMessage={() => "Type at least 2 characters to search..."}
+        loadingMessage={() => "Searching users..."}
+        styles={{
+          option: (base) => ({
+            ...base,
+            color: 'black'
+          })
+        }}
+      />
     </div>
   );
 }

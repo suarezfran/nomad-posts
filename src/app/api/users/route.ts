@@ -7,13 +7,14 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     // Build the where clause for user search
-    const whereClause: any = {};
-    if (search) {
-      whereClause.OR = [
-        { name: { contains: search } },
-        { username: { contains: search } }
-      ];
-    }
+    const whereClause = search 
+      ? {
+          OR: [
+            { name: { contains: search } },
+            { username: { contains: search } }
+          ]
+        }
+      : {};
 
     // Fetch users with search functionality
     const users = await prisma.user.findMany({
