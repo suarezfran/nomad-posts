@@ -42,13 +42,13 @@ pnpm install
 3. Set up the database:
 ```bash
 # Generate Prisma client
-pnpm prisma generate
+pnpm db:generate
 
 # Run database migrations
-pnpm prisma migrate dev
+pnpm db:migrate
 
 # Seed the database (optional)
-pnpm prisma db seed
+pnpm db:seed
 ```
 
 4. Start the development server:
@@ -64,6 +64,10 @@ pnpm dev
 - `pnpm build` - Build the application for production
 - `pnpm start` - Start the production server
 - `pnpm lint` - Run ESLint for code quality checks
+- `pnpm db:generate` - Generate Prisma client
+- `pnpm db:migrate` - Run database migrations
+- `pnpm db:push` - Push schema changes to database
+- `pnpm db:seed` - Seed the database with sample data
 
 ## Development
 
