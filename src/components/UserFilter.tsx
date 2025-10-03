@@ -55,26 +55,6 @@ export default function UserFilter({ onFilter, disabled }: UserFilterProps) {
 
   return (
     <div>
-      <div className="flex items-center mb-4">
-        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mr-3">
-          <svg
-            className="w-4 h-4 text-blue-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
-        <label className="text-lg font-semibold text-gray-800">
-          Filter by User
-        </label>
-      </div>
       <Select
         isClearable
         isSearchable
@@ -89,11 +69,12 @@ export default function UserFilter({ onFilter, disabled }: UserFilterProps) {
         styles={{
           control: (base, state) => ({
             ...base,
-            border: "2px solid #e2e8f0",
-            borderRadius: "12px",
-            padding: "4px 8px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            padding: "2px 6px",
+            minHeight: "36px",
             boxShadow: state.isFocused
-              ? "0 0 0 3px rgba(59, 130, 246, 0.1)"
+              ? "0 0 0 2px rgba(59, 130, 246, 0.1)"
               : "none",
             borderColor: state.isFocused ? "#3b82f6" : "#e2e8f0",
             "&:hover": {
@@ -114,10 +95,10 @@ export default function UserFilter({ onFilter, disabled }: UserFilterProps) {
           }),
           menu: (base) => ({
             ...base,
-            borderRadius: "12px",
-            border: "2px solid #e2e8f0",
+            borderRadius: "8px",
+            border: "1px solid #e2e8f0",
             boxShadow:
-              "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
           }),
           placeholder: (base) => ({
             ...base,
