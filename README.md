@@ -30,7 +30,7 @@ The application uses the following data models:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/suarezfran/nomad-social
+git clone git@github.com:suarezfran/nomad-social.git
 cd nomad-social
 ```
 
