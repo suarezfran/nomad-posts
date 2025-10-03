@@ -37,9 +37,9 @@ export default function Home() {
 
         {/* Footer */}
         <div className="mt-16 pt-8 border-t border-white/10">
-          <p className="text-gray-400 text-sm">
+          <Link href="https://www.linkedin.com/in/fransuarez" className="text-gray-400 text-sm">
             Hope you like it - by <span className="text-blue-400 font-medium">Francisco Suarez</span>
-          </p>
+          </Link>
         </div>
       </div>
     </main>
