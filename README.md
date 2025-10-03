@@ -1,4 +1,4 @@
-# Nomad Posts
+# Nomad Social
 
 A Next.js application that displays posts with user information, built with Prisma and SQLite database.
 
@@ -30,8 +30,8 @@ The application uses the following data models:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/suarezfran/nomad-posts
-cd nomad-posts
+git clone https://github.com/suarezfran/nomad-social
+cd nomad-social
 ```
 
 2. Install dependencies:
