@@ -60,83 +60,46 @@ async function fetchPosts(): Promise<PostData[]> {
 }
 
 async function seedUsers(users: UserData[]) {
-  for (const user of users) {
-    await prisma.user.upsert({
-      where: { id: user.id },
-      update: {
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        phone: user.phone,
-        website: user.website,
-      },
-      create: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        phone: user.phone,
-        website: user.website,
-      },
-    })
+  // First, create all unique companies
+  const uniqueCompanies = Array.from(
+    new Map(users.map(u => [u.company.name, u.company])).values()
+  );
 
-    // Create address record
-    await prisma.address.upsert({
-      where: { userId: user.id },
-      update: {
-        street: user.address.street,
-        suite: user.address.suite,
-        city: user.address.city,
-        zipcode: user.address.zipcode,
-        lat: user.address.geo.lat,
-        lng: user.address.geo.lng,
-      },
-      create: {
-        userId: user.id,
-        street: user.address.street,
-        suite: user.address.suite,
-        city: user.address.city,
-        zipcode: user.address.zipcode,
-        lat: user.address.geo.lat,
-        lng: user.address.geo.lng,
-      },
-    })
+  await prisma.company.createMany({
+    data: uniqueCompanies
+  })
 
-    // Create company record
-    await prisma.company.upsert({
-      where: { userId: user.id },
-      update: {
-        name: user.company.name,
-        catchPhrase: user.company.catchPhrase,
-        bs: user.company.bs,
-      },
-      create: {
-        userId: user.id,
-        name: user.company.name,
-        catchPhrase: user.company.catchPhrase,
-        bs: user.company.bs,
-      },
-    })
-  }
+  // Get company IDs
+  const companies = await prisma.company.findMany()
+  const companyMap = new Map(companies.map(c => [c.name, c.id]))
+
+  // Prepare user data
+  const userData = users.map(user => ({
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    phone: user.phone,
+    website: user.website,
+    street: user.address.street,
+    suite: user.address.suite,
+    city: user.address.city,
+    zipcode: user.address.zipcode,
+    lat: user.address.geo.lat,
+    lng: user.address.geo.lng,
+    companyId: companyMap.get(user.company.name)
+  }))
+
+  // Use createMany for bulk insert
+  await prisma.user.createMany({
+    data: userData
+  })
 }
 
 async function seedPosts(posts: PostData[]) {
-  for (const post of posts) {
-    await prisma.post.upsert({
-      where: { id: post.id },
-      update: {
-        userId: post.userId,
-        title: post.title,
-        body: post.body,
-      },
-      create: {
-        id: post.id,
-        userId: post.userId,
-        title: post.title,
-        body: post.body,
-      },
-    })
-  }
+  await prisma.post.createMany({
+    data: posts
+  })
 }
 
 async function main() {
@@ -146,13 +109,13 @@ async function main() {
       fetchUsers(),
       fetchPosts()
     ])
-    
+
     // Seed users first (posts depend on users)
     await seedUsers(users)
-    
+
     // Seed posts
     await seedPosts(posts)
-    
+
   } catch (error) {
     console.error('❌ Error during seeding:', error)
     process.exit(1)

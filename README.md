@@ -15,10 +15,9 @@ A Next.js application that displays posts with user information, built with Pris
 
 The application uses the following data models:
 
-- **User**: User profiles with contact information
+- **User**: User profiles with contact information and address details
 - **Post**: Blog posts associated with users
-- **Address**: User address information
-- **Company**: User company information
+- **Company**: Company information (one-to-many relationship with users)
 
 ## Getting Started
 

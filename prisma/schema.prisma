@@ -8,38 +8,30 @@ datasource db {
 }
 
 model User {
-  id       Int     @id
-  name     String
-  username String?
-  email    String?
-  phone    String?
-  website  String?
-  address  Address?
-  company  Company?
-  posts    Post[]
-
-  @@index([id])
+  id        Int     @id
+  name      String
+  username  String
+  email     String
+  phone     String
+  website   String
+  street    String
+  suite     String
+  city      String
+  zipcode   String
+  lat       String
+  lng       String
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
+  posts     Post[]
 }
 
-model Address {
-  id       Int     @id @default(autoincrement())
-  userId   Int     @unique
-  street   String
-  suite    String
-  city     String
-  zipcode  String
-  lat      String
-  lng      String
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
 
 model Company {
   id          Int     @id @default(autoincrement())
-  userId      Int     @unique
   name        String
   catchPhrase String
   bs          String
-  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users       User[]
 }
 
 model Post {
